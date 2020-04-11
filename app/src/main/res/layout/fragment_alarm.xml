@@ -17,27 +17,28 @@
 
 
         <TextView
-            android:id="@+id/counter_text"
+            android:id="@+id/alarm_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{viewModel.counterText}"
-            app:layout_constraintBottom_toTopOf="@+id/button_increase"
+            android:text="@{viewModel.alarmText}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display3"
+            app:layout_constraintBottom_toTopOf="@+id/alarm_enabled"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Counter: 100" />
+            tools:text="08:45" />
 
-        <Button
-            android:id="@+id/button_increase"
+        <Switch
+            android:id="@+id/alarm_enabled"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{() -> viewModel.increaseCount()}"
-            android:text="Increase"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/counter_text" />
+            app:layout_constraintTop_toBottomOf="@+id/alarm_time" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

@@ -17,17 +17,24 @@
 package com.fmsz.sleeplogger.alarm
 
 import android.app.Application
+import android.os.Bundle
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.savedstate.SavedStateRegistryOwner
 
 /**
  * Simple ViewModel factory that provides the MarsProperty and context to the ViewModel.
  */
-class AlarmViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
+class AlarmViewModelFactory(
+    private val application: Application, owner: SavedStateRegistryOwner,
+    defaultArgs: Bundle? = null
+) :
+    AbstractSavedStateViewModelFactory(owner, defaultArgs) {
     @Suppress("unchecked_cast")
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
         if (modelClass.isAssignableFrom(AlarmViewModel::class.java)) {
-            return AlarmViewModel(application) as T
+            return AlarmViewModel(application, handle) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
