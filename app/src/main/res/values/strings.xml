@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">SleepLogger</string>
+
+    <plurals name="hour">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+    <plurals name="minute">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
 </resources>

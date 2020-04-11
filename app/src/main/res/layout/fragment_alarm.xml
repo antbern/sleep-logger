@@ -21,23 +21,50 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{viewModel.alarmText}"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display3"
-            app:layout_constraintBottom_toTopOf="@+id/alarm_enabled"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display4"
+            app:layout_constraintBottom_toTopOf="@+id/alarm_progress"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
             tools:text="08:45" />
 
-        <Switch
+        <ProgressBar
+            android:id="@+id/alarm_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:max="1000"
+            android:progress="@{viewModel.progressValue}"
+            app:layout_constraintBottom_toTopOf="@+id/alarm_enabled"
+            app:layout_constraintEnd_toEndOf="@+id/alarm_time"
+            app:layout_constraintStart_toStartOf="@+id/alarm_time"
+            app:layout_constraintTop_toBottomOf="@+id/alarm_time" />
+
+        <TextView
             android:id="@+id/alarm_enabled"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@{viewModel.alarmEnabledText}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            app:layout_constraintBottom_toTopOf="@+id/alarm_enabled_switch"
+            app:layout_constraintEnd_toEndOf="@+id/alarm_time"
+            app:layout_constraintStart_toStartOf="@+id/alarm_time"
+            app:layout_constraintTop_toBottomOf="@+id/alarm_progress"
+            tools:text="Alarm On" />
 
+        <Switch
+            android:id="@+id/alarm_enabled_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/alarm_time" />
+            app:layout_constraintEnd_toEndOf="@+id/alarm_time"
+            app:layout_constraintStart_toStartOf="@+id/alarm_time"
+            app:layout_constraintTop_toBottomOf="@+id/alarm_enabled"
+            android:checked="@{viewModel.alarmEnabled}"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

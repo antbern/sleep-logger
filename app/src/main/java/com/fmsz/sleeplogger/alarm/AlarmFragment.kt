@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Switch
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -36,31 +37,19 @@ class AlarmFragment : Fragment() {
         // set the viewModel binding variable to be used within the layout
         binding.viewModel = viewModel
 
-        // add a CheckedChangeListener listener to the alarm on/off switch
-        binding.alarmEnabled.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.setAlarmEnabled(isChecked)
+        // add a click listener to the alarm on/off switch
+        // (using a onCheckedChangedListener is not good since the switch is connected to
+        // viewModel.alarmEnabled, causing a lot of confusing updates when it changes (and the callback fires)
+        binding.alarmEnabledSwitch.setOnClickListener { view ->
+            viewModel.setAlarmEnabled((view as Switch).isChecked)
         }
 
         // add click listener to the label displaying the current time
         binding.alarmTime.setOnClickListener {
-            AlarmTimePickerFragment(viewModel.alarmTime.value) { newTime ->
+            AlarmTimePickerFragment(AlarmTime.fromMillis(viewModel.alarmTime.value!!)) { newTime ->
                 viewModel.onSetAlarmTime(newTime)
             }.show(parentFragmentManager, "timePicker")
         }
-
-        viewModel.alarmTime.observe(viewLifecycleOwner, Observer { newTime ->
-            // calculate difference from now
-            val diff = (newTime - System.currentTimeMillis()) / 1000
-            val minutes = (diff / 60) % 60
-            val hours = (diff / 60) / 60
-
-
-            Toast.makeText(
-                context,
-                "Alarm goes off in $hours hours and $minutes minutes",
-                Toast.LENGTH_SHORT
-            ).show()
-        })
 
         return binding.root
     }
