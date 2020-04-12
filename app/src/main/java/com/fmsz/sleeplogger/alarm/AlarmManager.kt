@@ -8,7 +8,7 @@ import android.content.SharedPreferences
 import android.widget.Toast
 import androidx.core.content.getSystemService
 import androidx.lifecycle.LiveData
-import com.fmsz.sleeplogger.MainActivity
+import androidx.navigation.NavDeepLinkBuilder
 import com.fmsz.sleeplogger.R
 import java.util.*
 import kotlin.math.ceil
@@ -33,30 +33,31 @@ class AlarmManager {
             getPreferences(c), KEY_ALARM_START, 0
         )
 
-        fun setAlarm(c: Context, alarmTime: AlarmTime) {
-            val correctedTime = alarmTime.getCorrectedTimeMillis()
+        fun setAlarm(c: Context, alarmTime: AlarmTime) =
+            setAlarm(c, alarmTime.getCorrectedTimeMillis())
+
+        private fun setAlarm(c: Context, alarmTime: Long) {
 
             // use AlarmManager to enable the alarm if its available
             getAlarmManager(c)?.let { manager ->
                 // set the system alarm clock
                 manager.setAlarmClock(
-                    AlarmManager.AlarmClockInfo(correctedTime, getActivityIntent(c)),
+                    AlarmManager.AlarmClockInfo(alarmTime, getActivityIntent(c)),
                     getAlarmReceiverIntent(c)
                 )
 
                 // update alarm time and start time in persistent storage
                 getPreferences(c).edit()
-                    .putLong(KEY_ALARM_TIME, correctedTime)
+                    .putLong(KEY_ALARM_TIME, alarmTime)
                     .putLong(KEY_ALARM_START, System.currentTimeMillis())
                     .apply()
 
                 // alert the user of the new alarm
-                advertiseAlarm(c, correctedTime)
+                advertiseAlarm(c, alarmTime)
             }
         }
 
         fun cancelAlarm(c: Context) {
-
             // cancel the system alarm
             getAlarmManager(c)?.cancel(getAlarmReceiverIntent(c))
 
@@ -82,12 +83,24 @@ class AlarmManager {
 
         // returns the PendingIntent to be called when the user clicks the alarm icon in the status bar
         private fun getActivityIntent(context: Context): PendingIntent {
-            return PendingIntent.getActivity(
-                context,
-                0,
-                Intent(context, MainActivity::class.java),
-                0
-            )
+            return NavDeepLinkBuilder(context)
+                .setGraph(R.navigation.nav_graph)
+                .setDestination(R.id.alarmFragment)
+                .createPendingIntent()
+        }
+
+        fun onSystemReboot(c: Context) {
+            // check if there is any pending alarm by reading from the preferences
+            val alarmStartTime = getPreferences(c).getLong(KEY_ALARM_START, -1)
+            if (alarmStartTime > 0) {
+
+                // there is an active alarm, check whether it has already passed or not and set the alarm accordingly
+                val alarmTime = getPreferences(c).getLong(KEY_ALARM_TIME, -1)
+                when (alarmTime > System.currentTimeMillis()) {
+                    true -> setAlarm(c, alarmTime)
+                    false -> cancelAlarm(c)
+                }
+            }
         }
 
         // shows an informative Toast to the user about when the alarm will go off
@@ -141,6 +154,10 @@ data class AlarmTime(val hour: Int, val minute: Int) {
     }
 }
 
+/**
+ * Class to provide a LiveData object from a SharedPreferences value
+ * Inspired by this article: https://medium.com/@jurajkunier/android-shared-preferences-listener-implemented-by-rxjava-and-livedata-cfac02683eac]
+ */
 class SharedPreferencesLiveDataLong(
     private val preferences: SharedPreferences,
     private val preferenceKey: String,
